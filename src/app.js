@@ -25,13 +25,13 @@ app.post('/products', (request, response) => { //FAZER O TESTE DO LOVERS PRA SAB
   const product = request.body;
   product.id = uuid();
 
-  if(products.find(num => num.code == product.code) == undefined){
-    product.lovers = 0 ;
-  }else{
+  if (products.find(num => num.code == product.code) == undefined) {
+    product.lovers = 0;
+  } else {
     const aaa = products.filter(num => num.code == product.code);
     product.lovers = aaa[0].lovers
   }
-  
+
   products.push(product);
   response.status(201).json(product);
 
@@ -57,9 +57,9 @@ app.put('/products/:id', (request, response) => { //ok
     product[0].tags = tags;
 
 
-    response.json(product);
+    response.status(200).json(product);
   }
-  return response.json();
+  response.status(400).json();
 });
 
 
@@ -82,8 +82,13 @@ app.post('/products/:code/love', (request, response) => {
   // TODO: Incrementa em 1 o número de lovers de todos os produtos que possuam 
   // o code do parâmetro
   //const product = products.map(num => num.code == request.params.code ? num.lovers++ : num.lovers)
-  const product = products.filter(num => num.code == request.params.code).map(num => num.lovers++)
-  response.json(product)
+  const { code } = request.params;
+
+  products = products.filter(product => product.code == code).map(product => ({ ...product, lovers: product.lovers + 1 }))
+
+
+  //const product = products.filter(num => num.code == request.params.code).map(num => num.lovers++)
+  response.json(products)
 });
 
 app.get('/products/:code', (request, response) => { //okay
@@ -92,11 +97,12 @@ app.get('/products/:code', (request, response) => { //okay
   const product = products.find(num => num.code == code);
 
   if (product == undefined) {
-    response.status(204)
-
+    response.status(204).json();
+  } else {
+    product = products.filter(value => value.code == code)
+    response.json(product);
   }
 
-  response.json(product);
 
 });
 
